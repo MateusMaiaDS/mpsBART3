@@ -5,7 +5,7 @@
 #'
 # Getting the BART wrapped function
 #' @export
-rbart <- function(x_train,
+mpsbart <- function(x_train,
                   y,
                   x_test,
                   n_tree = 2,
