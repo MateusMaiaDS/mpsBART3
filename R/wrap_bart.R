@@ -108,23 +108,27 @@ mpsbart <- function(x_train,
 
      # New_knots
      new_knots <- matrix()
-     new_knots <- mapply(min_x,max_x, FUN = function(MIN,MAX){seq(from = MIN-3*dx, to = MAX+3*dx, by = dx)})
+     # new_knots <- mapply(min_x,max_x, FUN = function(MIN,MAX){seq(from = MIN-3*dx, to = MAX+3*dx, by = dx)}) # MIN and MAX are 0 and 1 respectively, because of the scale
+     new_knots <- matrix(mapply(min_x,max_x, FUN = function(MIN,MAX){seq(from = -3*dx, to = 1+3*dx, by = dx)}), ncol = length(continuous_vars)) # MIN and MAX are 0 and 1 respectively, because of the scale
+     colnames(new_knots) <- continuous_vars
 
+     # print(new_knots)
      # Creating the natural B-spline for each predictor
      for(i in 1:length(continuous_vars)){
-             # B_train_obj <- splines::bs(x = x_train_scale[,continuous_vars[i], drop = FALSE],knots = knots[,continuous_vars[i]],
-             #                            intercept = FALSE,
-             #                            Boundary.knots = c((min_x[i]),max_x[i]))
-             B_train_obj <- splines::spline.des(x = x_train_scale[,continuous_vars[i], drop = FALSE],
-                                                knots = new_knots[,continuous_vars[i]],
-                                                ord = 4,
-                                                derivs = 0*x_train_scale[,continuous_vars[i], drop = FALSE],outer.ok = TRUE)$design
+       # B_train_obj <- splines::bs(x = x_train_scale[,continuous_vars[i], drop = FALSE],knots = knots[,continuous_vars[i]],
+       #                            intercept = FALSE,
+       #                            Boundary.knots = c((min_x[i]),max_x[i]))
+       B_train_obj <- splines::spline.des(x = x_train_scale[,continuous_vars[i], drop = FALSE],
+                                          knots = new_knots[,continuous_vars[i]],
+                                          ord = 4,
+                                          derivs = 0*x_train_scale[,continuous_vars[i], drop = FALSE],outer.ok = FALSE)$design
 
-             B_train_arr[,,i] <- as.matrix(B_train_obj)
-             B_test_arr[,,i] <- splines::spline.des(x = x_test_scale[,continuous_vars[i], drop = FALSE],
-                                                    knots = new_knots[,continuous_vars[i]],
-                                                    ord = 4,
-                                                    derivs = 0*x_test_scale[,continuous_vars[i], drop = FALSE],outer.ok = TRUE)$design
+       B_train_arr[,,i] <- as.matrix(B_train_obj)
+       # B_test_arr[,,i] <- as.matrix(predict(B_train_obj,newx = x_test_scale[,continuous_vars[i], drop = FALSE]))
+       B_test_arr[,,i] <- splines::spline.des(x = x_test_scale[,continuous_vars[i], drop = FALSE],
+                                              knots = new_knots[,continuous_vars[i]],
+                                              ord = 4,
+                                              derivs = 0*x_test_scale[,continuous_vars[i], drop = FALSE],outer.ok = TRUE)$design
 
      }
 
