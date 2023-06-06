@@ -104,10 +104,11 @@ mpsbart <- function(x_train,
 
      # Setting new parameters for the spline
      ndx <- nIknots
-     dx <- (max_x-min_x)/ndx
+     dx <- 1/ndx
 
      # New_knots
      new_knots <- matrix()
+     print(dx)
      # new_knots <- mapply(min_x,max_x, FUN = function(MIN,MAX){seq(from = MIN-3*dx, to = MAX+3*dx, by = dx)}) # MIN and MAX are 0 and 1 respectively, because of the scale
      new_knots <- matrix(mapply(min_x,max_x, FUN = function(MIN,MAX){seq(from = -3*dx, to = 1+3*dx, by = dx)}), ncol = length(continuous_vars)) # MIN and MAX are 0 and 1 respectively, because of the scale
      colnames(new_knots) <- continuous_vars
